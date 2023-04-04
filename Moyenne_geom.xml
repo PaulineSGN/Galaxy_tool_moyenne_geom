@@ -1,0 +1,59 @@
+<tool id="Moyenne_geom" name="Moyenne geom" version="0.1.0+galaxy0">
+    <requirements>
+       <requirement type="package" version="4.2.3">r-base</requirement>
+       <requirement type="package" version="2.18.0.1">r-gdata</requirement>
+       <requirement type="package" version="1.0.7">r-xlconnect</requirement>
+       <requirement type="package" version="6.5-0">r-rms</requirement>
+       <requirement type="package" version="1.1-3">r-mvtnorm</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        Rscript
+         '$__tool_directory__/Moyenne_geom.r'
+         '$input'
+         '$nrep'
+         '$separator'
+         'colnames'
+         '$output1'
+         '$output2'
+         '$output3'
+         '$output4'
+    ]]></command>
+    <inputs>
+      <param name="input" type="data" format="csv,txt,tsv" label="Source file"/>
+      <param name="nrep" type="integer" label="Number of samples" value= "1"/>
+      <param name="separator" type="text" label="What character is the seprator in your dataframe?"/>
+      <param name="colnames" type="boolean" label="The first line of your dataframe represents the names of columns?"/>
+    </inputs>
+    <outputs>
+      <data name="output1" from_work_dir="res2008_2012_scaled.txt" format="txt" label="res2008_2012_scaled.txt"/>
+      <data name="output2" from_work_dir="res2013_2017_scaled.txt" format="txt" label="res2013_2017_scaled.txt"/>
+      <data name="output3" from_work_dir="regres2008_2012_scaled.txt" format="txt" label="regres2008_2012_scaled.txt"/>
+      <data name="output4" from_work_dir="regres2013_2017_scaled.txt" format="txt" label="regres2013_2017_scaled.txt"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name='input' value="0_RESULTATS_BOIS_BIODIV_2021_V2.csv"/>
+            <param name='nrep' value="10000"/>
+            <param name='separator' value=","/>
+            <param name='colnames' value="TRUE"/>
+            <output name='output1' value="res2008_2012_scaled.txt"/>
+            <output name='output2' value="res2013_2017_scaled.txt"/>
+            <output name='output3' value="regres2008_2012_scaled.txt"/>
+            <output name='output4' value="regres2013_2017_scaled.txt"/>
+        </test>
+        <test>
+            <param name='input' value="0_RESULTATS_BOIS_BIODIV_2021_V2.txt"/>
+            <param name='nrep' value="10000"/>
+            <param name='separator' value=","/>
+            <param name='colnames' value="TRUE"/>
+            <output name='output1' value="res2008_2012_scaled.txt"/>
+            <output name='output2' value="res2013_2017_scaled.txt"/>
+            <output name='output3' value="regres2008_2012_scaled.txt"/>
+            <output name='output4' value="regres2013_2017_scaled.txt"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+    **HELP**
+    ]]></help>
+</tool>
+
