@@ -21,8 +21,13 @@
     <inputs>
       <param name="input" type="data" format="csv,txt,tsv" label="Source file"/>
       <param name="nrep" type="integer" label="Number of samples" value= "1"/>
-      <param name="separator" type="text" label="What character is the seprator in your dataframe?"/>
+      <param name="separator" type="select" label="What character is the seprator in your dataframe?">
+             <option value = ",">Comma</option>
+             <option value = "\t">Tab</option>
+             <option value = ";">Semicolon</option>
+      </param>
       <param name="colnames" type="boolean" label="The first line of your dataframe represents the names of columns?"/>
+     
     </inputs>
     <outputs>
       <data name="output1" from_work_dir="res2008_2012_scaled.txt" format="txt" label="res2008_2012_scaled.txt"/>
