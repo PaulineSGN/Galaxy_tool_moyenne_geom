@@ -13,9 +13,8 @@ if (length(args)==0)
     stop("This tool needs at least one argument")
 }else{
     data <- args[1]
-    nrep <- as.numeric(args[2])
-    sep <- args[3]
-    HR <- args[4]
+    sep <- args[2]
+    HR <- args[3]
      
 }
 
@@ -23,8 +22,9 @@ if (HR =="false"){HR<-FALSE} else {HR<-TRUE}
 
 ###nrep: number of samples used to calculate geometric means
 ###nrep: nombre d'échantillons utilisés pour calculer les moyennes géométriques
-nrep<-nrep
+nrep<-10000
 
+#______________________________________________________________________________________________________________________________________________________________________________________________
 ###### common functions
 ###### fonction utiles pour la suite
 
@@ -53,12 +53,12 @@ nrep<-nrep
 		geomm.rep<-apply(temp,1,function(x){(mean(log(x),na.rm=TRUE))})
 		#c(mean(geomm.rep),sd(geomm.rep))
 		geomm.rep}
-
-
+#_______________________________________________________________________________________________________________________________________________________________________________________________
 
 ###### importation des données
 ###### importation of data
 temp<-read.csv(file=data,sep=sep,header=HR,encoding="UTF-8")
+
 data2008_2012<-temp[4:14,]
 data2013_2017<-temp[21:31,]
 
@@ -91,20 +91,26 @@ rest2013_2017<-sapply(1:dim(data2013_2017)[1],function(region){lgeomean(meandata
 
 #for the first period
 #pour la première période
-res2008_2012_scaled<-{temp<-apply(rest2008_2012_s3,1,function(x){mean(x)})-apply(rest2008_2012,1,function(x){mean(x)});c(mean(exp(temp)),sd(exp(temp)),quantile(exp(temp),prob=c(0.025,0.975)))}
+Mean_2008_2012_scaled<-{temp<-apply(rest2008_2012_s3,1,function(x){mean(x)})-apply(rest2008_2012,1,function(x){mean(x)});c(mean(exp(temp)),sd(exp(temp)),quantile(exp(temp),prob=c(0.025,0.975)))}
 
 #for the second period
 #pour la seconde période
-res2013_2017_scaled<-{temp<-apply(rest2013_2017,1,function(x){mean(x)})-apply(rest2008_2012,1,function(x){mean(x)});c(mean(exp(temp)),sd(exp(temp)),quantile(exp(temp),prob=c(0.025,0.975)))}
+Mean_2013_2017_scaled<-{temp<-apply(rest2013_2017,1,function(x){mean(x)})-apply(rest2008_2012,1,function(x){mean(x)});c(mean(exp(temp)),sd(exp(temp)),quantile(exp(temp),prob=c(0.025,0.975)))}
+
+
 
 ############### NATIONAL OUPUTS:
 ############### SORTIES NATIONALES:
 
-res2008_2012_scaled
-res2013_2017_scaled
+res2008_2012_scaled_df = data.frame(Mean_2008_2012_scaled)
+res2008_2012_scaled_df=`rownames<-`(res2008_2012_scaled_df,c("mean","sd","2,5%","97,5%"))
 
-write(res2008_2012_scaled, file = "res2008_2012_scaled.txt")
-write(res2013_2017_scaled,file= "res2013_2017_scaled.txt")
+res2013_2017_scaled_df = data.frame(Mean_2013_2017_scaled)
+res2013_2017_scaled_df=`rownames<-`(res2013_2017_scaled_df,c("mean","sd","2,5%","97,5%"))
+
+
+write.csv(res2008_2012_scaled_df, file = "res2008_2012_scaled.csv")
+write.csv(res2013_2017_scaled_df,file= "res2013_2017_scaled.csv")
 
 ############### REGIONAL OUPUTS:
 ############### SORTIES REGIONALES (GRECO):
@@ -114,5 +120,37 @@ regres2013_2017_scaled<-apply(rest2013_2017-rest2008_2012,2,function(x){temp<-x;
 dimnames(regres2008_2012_scaled)[[2]]<-as.character(data2008_2012[,2])
 dimnames(regres2013_2017_scaled)[[2]]<-as.character(data2013_2017[,2])
 
-write(regres2008_2012_scaled, file = "regres2008_2012_scaled.txt")
-write(regres2013_2017_scaled, file = "regres2013_2017_scaled.txt")
+write.csv(regres2008_2012_scaled, file = "regres2008_2012_scaled.csv")
+write.csv(regres2013_2017_scaled, file = "regres2013_2017_scaled.csv")
+
+############### data to make a bar plot of the national evolution rate 
+histo_data = data.frame(
+  variable_name = c(names(res2008_2012_scaled_df),names(res2013_2017_scaled_df)), 
+  variable = c(round(Mean_2008_2012_scaled[1]*100),round(Mean_2013_2017_scaled[1]*100)),
+  standard_deviation = c(Mean_2008_2012_scaled[2]*100,Mean_2013_2017_scaled[2]*100)
+)
+
+write.table(histo_data, file = "histo_data.tsv",row.names = F, col.names = T ,sep ="\t")
+
+############### data to make a map of the GRECO evolution rate
+
+rate2008_2012 = data.frame(round(regres2008_2012_scaled[1,1:11]*100))
+rate2013_2017 = data.frame(round(regres2013_2017_scaled[1,1:11]*100))
+
+evol_rate = rate2013_2017-rate2008_2012
+evol_rate = cbind(data2013_2017[,2],evol_rate)
+colnames(evol_rate)<-c("Regions","Evolution_rate")
+
+
+write.table(evol_rate,"evolution_rate.tsv",sep="\t",quote=F,row.names=F,col.names=T)
+
+
+
+
+
+
+
+
+
+
+
